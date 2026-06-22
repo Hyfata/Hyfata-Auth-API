@@ -24,7 +24,8 @@ Spring Boot 3.4.4 기반의 OAuth 2.0 인증/인가 서버. Google OAuth, Discor
 - OAuth 2.0 Scope 표준 준수 (RFC 6749)
 - 클라이언트별 `defaultScopes` / `allowedScopes` 설정
 - 민감 API(`account:password`, `2fa:manage` 등)에 `@RequireScope` 적용
-- 관리자만 민감 Scope를 가진 클라이언트 등록 가능
+- First-Party(공식) 클라이언트만 민감 Scope 사용 가능, 설정 파일로 관리
+- Third-Party 클라이언트는 API 등록 시 `profile email`로 제한되거나 관리자가 제한된 Scope만 부여 가능
 
 ### 완전한 인증 시스템
 - JWT 기반 토큰 (Access: 15분, Refresh: 14일)
@@ -50,30 +51,46 @@ Spring Boot 3.4.4 기반의 OAuth 2.0 인증/인가 서버. Google OAuth, Discor
 - Gradle 7.6+
 
 ### 환경 변수 설정 (.env)
+
 ```properties
-# Database
+# Database (required)
 DB_URL=jdbc:postgresql://localhost:5432/hyfata_db
 DB_USER=postgres
 DB_PASSWORD=your_password
 
-# JWT
+# R2DBC (optional, 현재 미사용 시 주석 처리 가능)
+# R2DBC_URL=r2dbc:postgresql://localhost:5432/hyfata_db
+
+# JWT (required)
 JWT_SECRET=minimum-32-characters-strong-secret-key
 
-# Redis
+# Redis (required)
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=
 
-# Mail (optional)
+# Mail (required for email verification, 2FA, password reset, account restore)
 MAIL_HOST_NAME=mail.hyfata.kr
 MAIL_PORT=587
 MAIL_USERNAME=noreply@hyfata.kr
 MAIL_PASSWORD=your_password
 MAIL_FROM=noreply@hyfata.kr
 
-# First-Party OAuth Client (official website)
+# Public API URL (required for email links)
+API_URL=https://api.hyfata.kr
+
+# CORS (required for production)
+CORS_URLS=https://hyfata.kr,https://app.hyfata.kr
+
+# First-Party OAuth Client (official website, required)
 OFFICIAL_WEB_CLIENT_ID=hyfata-official-web
 OFFICIAL_WEB_CLIENT_SECRET=your_official_client_secret
+OFFICIAL_WEB_FRONTEND_URL=https://hyfata.kr
+OFFICIAL_WEB_REDIRECT_URIS=https://hyfata.kr/oauth/callback
+
+# GeoIP (optional)
+# GEOIP_DATABASE_PATH=./GeoLite2-City.mmdb
+# GEOIP_ENABLED=false
 ```
 
 ### 빌드 및 실행
@@ -109,6 +126,8 @@ OFFICIAL_WEB_CLIENT_SECRET=your_official_client_secret
 | PUT | `/api/account/password` | 비밀번호 변경 | `account:password` |
 | POST | `/api/account/deactivate` | 계정 비활성화 | `account:manage` |
 | DELETE | `/api/account` | 계정 영구 삭제 | `account:manage` |
+| POST | `/api/account/restore/request` | 계정 복구 이메일 요청 | Public |
+| GET | `/api/account/restore/confirm` | 계정 복구 확인 (이메일 링크) | Public |
 
 ### 세션 관리
 
@@ -129,8 +148,10 @@ OFFICIAL_WEB_CLIENT_SECRET=your_official_client_secret
 
 | 메서드 | 엔드포인트 | 설명 |
 |--------|-----------|------|
-| POST | `/api/clients/register` | 새 클라이언트 등록 (인증 필요) |
+| POST | `/api/clients/register` | Third-Party 클라이언트 등록 (인증 필요) |
 | GET | `/api/clients/{clientId}` | 클라이언트 정보 조회 |
+
+> **참고**: First-Party(공식) 클라이언트는 `/api/clients/register`로 등록할 수 없습니다. `application.properties` 또는 환경 변수로 정의되며, 애플리케이션 시작 시 자동으로 시드됩니다.
 
 ### 레거시 API (Deprecated)
 
