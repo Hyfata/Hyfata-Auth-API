@@ -26,8 +26,11 @@ public class ClientController {
     private final ClientService clientService;
 
     /**
-     * 새로운 클라이언트 등록 (OAuth 앱 생성과 유사)
+     * 새로운 Third-Party 클라이언트 등록 (OAuth 앱 생성과 유사)
      * POST /api/clients/register
+     *
+     * 이 API로는 Third-Party 클라이언트만 등록할 수 있습니다.
+     * First-Party(공식) 클라이언트는 application.properties 설정을 통해 관리됩니다.
      *
      * 요청 예시:
      * {

@@ -375,21 +375,27 @@ public ResponseEntity<?> changePassword(...) { ... }
 
 ### 10.1 `Client` 등록 시 scope 설정
 
-```java
-// 공식 사이트 클라이언트 등록 예시
-Client officialClient = Client.builder()
-    .name("Hyfata Official")
-    .clientId("client_official_001")
-    // ...
-    .defaultScopes("profile:read email profile:write account:password account:manage 2fa:manage sessions:manage")
-    .allowedScopes("profile:read email profile:write account:password account:manage 2fa:manage sessions:manage")
-    .build();
+**공식(First-Party) 클라이언트**는 `application.properties` 또는 환경 변수로 관리되며, 애플리케이션 시작 시 `FirstPartyClientInitializer`가 DB에 시드합니다.
 
+```properties
+app.first-party.clients[0].client-id=${OFFICIAL_WEB_CLIENT_ID:hyfata-official-web}
+app.first-party.clients[0].client-secret=${OFFICIAL_WEB_CLIENT_SECRET}
+app.first-party.clients[0].name=${OFFICIAL_WEB_CLIENT_NAME:Hyfata Official Web}
+app.first-party.clients[0].frontend-url=${OFFICIAL_WEB_FRONTEND_URL:https://hyfata.kr}
+app.first-party.clients[0].redirect-uris=${OFFICIAL_WEB_REDIRECT_URIS:https://hyfata.kr/oauth/callback}
+app.first-party.clients[0].default-scopes=${OFFICIAL_WEB_DEFAULT_SCOPES:profile email profile:write account:password account:manage 2fa:manage sessions:manage}
+app.first-party.clients[0].allowed-scopes=${OFFICIAL_WEB_ALLOWED_SCOPES:profile email profile:write account:password account:manage 2fa:manage sessions:manage}
+```
+
+**타사(Third-Party) 클라이언트**는 `POST /api/clients/register` API를 통해 등록되며, `clientType`은 `THIRD_PARTY`로 강제 설정됩니다.
+
+```java
 // 타사 클라이언트 등록 예시
 Client thirdPartyClient = Client.builder()
     .name("Third Party App")
     .clientId("client_third_001")
     // ...
+    .clientType(ClientType.THIRD_PARTY)
     .defaultScopes("profile:read email")
     .allowedScopes("profile:read email friends:read chat:read chat:write notifications:read")
     .build();

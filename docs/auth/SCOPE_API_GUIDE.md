@@ -132,13 +132,19 @@ account:manage → account:password (implicit)
 
 `POST /api/clients/register` (Authentication Required)
 
-**일반 개발자** (`ROLE_USER`):
-- `defaultScopes`와 `allowedScopes`는 무조건 **`profile email`**로 고정됩니다.
-- 요청에 다른 값을 담아도 서버가 강제로 덮어씁니다.
+**First-Party(공식) 클라이언트**:
+- `/api/clients/register` API로는 등록할 수 없습니다.
+- `application.properties` (또는 환경 변수)로만 등록/관리되며, 애플리케이션 시작 시 DB에 자동 시드됩니다.
+- 예: 공식 웹사이트, 공식 모바일 앱 등
 
-**관리자** (`ROLE_ADMIN`):
-- `defaultScopes`와 `allowedScopes`를 자유롭게 지정할 수 있습니다.
-- 공식 클라이언트를 등록할 때 사용합니다.
+**Third-Party(타사) 클라이언트**:
+- `/api/clients/register` API를 통해 등록할 수 있습니다.
+- **일반 개발자** (`ROLE_USER`):
+  - `defaultScopes`와 `allowedScopes`는 무조건 **`profile email`**로 고정됩니다.
+  - 요청에 다른 값을 담아도 서버가 강제로 덮어씁니다.
+- **관리자** (`ROLE_ADMIN`):
+  - `defaultScopes`와 `allowedScopes`를 자유롭게 지정할 수 있습니다.
+  - 단, 생성되는 클라이언트는 `clientType: THIRD_PARTY`로 강제 설정됩니다.
 
 ### 등록 요청 예시 (타사 개발자)
 

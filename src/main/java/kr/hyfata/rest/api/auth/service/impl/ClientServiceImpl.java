@@ -3,6 +3,7 @@ package kr.hyfata.rest.api.auth.service.impl;
 import kr.hyfata.rest.api.auth.dto.ClientRegistrationRequest;
 import kr.hyfata.rest.api.auth.dto.ClientResponse;
 import kr.hyfata.rest.api.auth.entity.Client;
+import kr.hyfata.rest.api.auth.entity.ClientType;
 import kr.hyfata.rest.api.auth.entity.User;
 import kr.hyfata.rest.api.auth.repository.ClientRepository;
 import kr.hyfata.rest.api.auth.repository.UserRepository;
@@ -72,6 +73,7 @@ public class ClientServiceImpl implements ClientService {
                 .maxTokensPerUser(request.getMaxTokensPerUser() != null ? request.getMaxTokensPerUser() : 5)
                 .defaultScopes(defaultScopes)
                 .allowedScopes(allowedScopes)
+                .clientType(ClientType.THIRD_PARTY)  // API로 생성되는 클라이언트는 모두 Third-Party
                 .build();
 
         // 소유자 설정 (optional)
@@ -146,6 +148,7 @@ public class ClientServiceImpl implements ClientService {
                 .maxTokensPerUser(client.getMaxTokensPerUser())
                 .defaultScopes(client.getDefaultScopes())
                 .allowedScopes(client.getAllowedScopes())
+                .clientType(client.getClientType())
                 .ownerId(client.getOwner() != null ? client.getOwner().getId() : null)
                 .createdAt(client.getCreatedAt())
                 .updatedAt(client.getUpdatedAt())
@@ -170,6 +173,7 @@ public class ClientServiceImpl implements ClientService {
                 .maxTokensPerUser(client.getMaxTokensPerUser())
                 .defaultScopes(client.getDefaultScopes())
                 .allowedScopes(client.getAllowedScopes())
+                .clientType(client.getClientType())
                 .ownerId(client.getOwner() != null ? client.getOwner().getId() : null)
                 .createdAt(client.getCreatedAt())
                 .updatedAt(client.getUpdatedAt())

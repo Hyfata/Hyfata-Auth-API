@@ -48,6 +48,11 @@ public class Client {
     @Builder.Default
     private Boolean enabled = true;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private ClientType clientType = ClientType.THIRD_PARTY;
+
     // 접근 통제
     @Column(nullable = false)
     @Builder.Default

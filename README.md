@@ -70,6 +70,10 @@ MAIL_PORT=587
 MAIL_USERNAME=noreply@hyfata.kr
 MAIL_PASSWORD=your_password
 MAIL_FROM=noreply@hyfata.kr
+
+# First-Party OAuth Client (official website)
+OFFICIAL_WEB_CLIENT_ID=hyfata-official-web
+OFFICIAL_WEB_CLIENT_SECRET=your_official_client_secret
 ```
 
 ### 빌드 및 실행

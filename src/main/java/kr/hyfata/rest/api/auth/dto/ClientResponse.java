@@ -1,5 +1,6 @@
 package kr.hyfata.rest.api.auth.dto;
 
+import kr.hyfata.rest.api.auth.entity.ClientType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class ClientResponse {
     private Integer maxTokensPerUser;
     private String defaultScopes;
     private String allowedScopes;
+    private ClientType clientType;
     private Long ownerId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

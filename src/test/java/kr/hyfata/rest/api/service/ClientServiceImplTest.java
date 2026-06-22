@@ -3,6 +3,7 @@ package kr.hyfata.rest.api.service;
 import kr.hyfata.rest.api.auth.dto.ClientRegistrationRequest;
 import kr.hyfata.rest.api.auth.dto.ClientResponse;
 import kr.hyfata.rest.api.auth.entity.Client;
+import kr.hyfata.rest.api.auth.entity.ClientType;
 import kr.hyfata.rest.api.auth.entity.User;
 import kr.hyfata.rest.api.auth.repository.ClientRepository;
 import kr.hyfata.rest.api.auth.repository.UserRepository;
@@ -126,5 +127,19 @@ class ClientServiceImplTest {
         // then
         assertThat(response.getDefaultScopes()).isEqualTo("profile email");
         assertThat(response.getAllowedScopes()).isEqualTo("profile email");
+    }
+
+    @Test
+    @DisplayName("API로 등록된 클라이언트는 항상 THIRD_PARTY 타입")
+    void registerClient_alwaysThirdPartyType() {
+        // given
+        Authentication adminAuth = new UsernamePasswordAuthenticationToken(
+                "admin@example.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+
+        // when
+        ClientResponse response = clientService.registerClient(request, adminAuth);
+
+        // then
+        assertThat(response.getClientType()).isEqualTo(ClientType.THIRD_PARTY);
     }
 }
