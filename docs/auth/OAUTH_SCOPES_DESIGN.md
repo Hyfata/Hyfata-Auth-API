@@ -456,39 +456,57 @@ API 호출 시 `403 Forbidden` + `"Insufficient scope"` 응답을 받으면, 사
 
 ## 12. 구현 단계별 로드맵
 
-### Phase 1: 데이터 모델 (1주)
-- [ ] `Client` 엔티티에 `defaultScopes`, `allowedScopes` 추가
-- [ ] `AuthorizationCode` 엔티티에 `scopes` 추가
-- [ ] `UserSession` 엔티티에 `scopes` 추가
-- [ ] DB 마이그레이션 파일 작성 (`V7__add_scopes.sql`)
-- [ ] `JwtUtil`에 `client_id`, `scope` 클레임 생성/추출 메서드 추가
+### Phase 1: 데이터 모델 ✅
+- [x] `Client` 엔티티에 `defaultScopes`, `allowedScopes` 추가
+- [x] `AuthorizationCode` 엔티티에 `scopes` 추가
+- [x] `UserSession` 엔티티에 `scopes` 추가
+- [x] DB 마이그레이션 파일 작성 (`V6__add_client_type.sql` 추가, scope 필드는 JPA `ddl-auto=update`로 적용)
+- [x] `JwtUtil`에 `client_id`, `scope` 클레임 생성/추출 메서드 추가
 
-### Phase 2: OAuth 흐름 통합 (1주)
-- [ ] `/oauth/authorize`에 `scope` 파라미터 파싱 및 검증
-- [ ] 클라이언트의 `allowedScopes` 초과 요청 시 `invalid_scope` 에러 반환
-- [ ] `/oauth/token`에서 JWT에 `client_id`, `scope` 클레임 포함
-- [ ] `UserSession` 생성 시 `scopes` 필드 저장
-- [ ] Refresh Token 갱신 시 기존 `scopes` 유지
+### Phase 2: OAuth 흐름 통합 ✅
+- [x] `/oauth/authorize`에 `scope` 파라미터 파싱 및 검증
+- [x] 클라이언트의 `allowedScopes` 초과 요청 시 `invalid_scope` 에러 반환
+- [x] `/oauth/token`에서 JWT에 `client_id`, `scope` 클레임 포함
+- [x] `UserSession` 생성 시 `scopes` 필드 저장
+- [x] Refresh Token 갱신 시 기존 `scopes` 유지
 
-### Phase 3: API 접근 제어 (1주)
-- [ ] `@RequireScope` 어노테이션 및 AOP 인터셉터 구현
-- [ ] 민감 API에 어노테이션 적용:
+### Phase 3: API 접근 제어 ✅
+- [x] `@RequireScope` 어노테이션 및 AOP 인터셉터 구현
+- [x] 민감 API에 어노테이션 적용:
   - `/api/account/**` → `account:password`, `account:manage`
   - `/api/auth/enable-2fa`, `/disable-2fa` → `2fa:manage`
   - `/api/sessions/**` → `sessions:manage`
-- [ ] `security.sensitive-endpoints`에 위 경로 추가 (토큰 블랙리스트 연동)
+- [x] `security.sensitive-endpoints`에 위 경로 추가 (토큰 블랙리스트 연동)
 
-### Phase 4: 기존 클라이언트 마이그레이션 (1주)
-- [ ] DB에서 기존 `clients` 레코드에 `defaultScopes`, `allowedScopes` 채우기
-  - 공식 클라이언트: 전체 scope
-  - 기존 타사 클라이언트: `profile:read email` (최소 권한)
-- [ ] Flutter 공식 앱에 `scope` 파라미터 추가
-- [ ] `docs/auth/FLUTTER_OAUTH_GUIDE.md` 업데이트
+### Phase 4: 클라이언트 관리 및 가이드 업데이트 ✅
+- [x] First-Party / Third-Party 클라이언트 구분 (`ClientType` 추가)
+- [x] First-Party 클라이언트를 `application.properties` 설정으로 시드 (`FirstPartyClientInitializer`)
+- [x] `/api/clients/register` API는 Third-Party 클라이언트만 생성 가능하도록 제한
+- [x] Flutter 공식 앱에 `scope` 파라미터 추가
+- [x] `docs/auth/FLUTTER_OAUTH_GUIDE.md` 업데이트
 
 ### Phase 5: Consent 화면 (선택, 향후)
 - [ ] `/oauth/authorize`에서 타사 클라이언트 로그인 시 scope 동의 화면 제공
 - [ ] 사용자가 scope를 선택적으로 체크/해제할 수 있도록 UI 제공
 - [ ] `AuthorizationCode.scopes`에 사용자가 동의한 scope만 저장
+
+---
+
+## 13. 운영 마이그레이션 참고사항
+
+이미 운영 중인 DB가 있고, 기존 `clients` 레코드에 `defaultScopes` / `allowedScopes`가 비어 있거나 `profile:read email` 등 예전 형식으로 되어 있다면, 다음 SQL을 참고해 수동으로 보정하세요.
+
+```sql
+-- 타사 클라이언트를 최소 권한으로 설정
+UPDATE clients
+SET default_scopes = 'profile email',
+    allowed_scopes = 'profile email'
+WHERE client_type = 'THIRD_PARTY'
+  AND (default_scopes IS NULL OR default_scopes = '');
+
+-- 공식 클라이언트는 설정 파일(FirstPartyClientInitializer)로 시드되므로
+-- 별도 수동 보정은 일반적으로 필요 없습니다.
+```
 
 ---
 
