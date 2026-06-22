@@ -101,6 +101,13 @@ public class User implements UserDetails {
     // 삭제 관련
     private LocalDateTime deletedAt;
 
+    // 계정 복구 관련
+    @Column(unique = true)
+    private String restoreToken;
+
+    @Column
+    private LocalDateTime restoreTokenExpiredAt;
+
     // 메타데이터
     @Column(nullable = false, updatable = false)
     @Builder.Default
@@ -153,6 +160,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return enabled && status == UserStatus.ACTIVE;
     }
 }

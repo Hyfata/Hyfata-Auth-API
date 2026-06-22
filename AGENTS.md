@@ -182,7 +182,7 @@ open build/reports/tests/test/index.html
 
 - **소스 코드 주석**: 한국어와 영어가 혼용되어 사용됩니다. 핵심 보안 로직(OAuth 흐름, JWT 검증 등)에는 한국어 주석이 많습니다.
 - **문서**: `docs/`와 `README.md`는 한국어로 작성되어 있습니다.
-- **커밋 메시지**: 한국어 사용이 일반적입니다.
+- **커밋 메시지**: 영어 사용을 일반적으로 해야합니다.
 
 ### 네이밍 및 패턴
 
@@ -284,15 +284,8 @@ public class AuthServiceImpl implements AuthService { ... }
 
 ### API 문서 동기화
 
-- **인증/인가 관련 API**(`auth` 모듈)의 요청/응답 스펙, 엔드포인트, DTO 등을 변경한 경우, 반드시 **`docs/auth/AUTH_API.md`** 를 함께 수정하세요.
-- Agora 모듈의 API를 변경한 경우, **`docs/agora/api/`** 내 해당 문서를 함께 수정하세요.
-
-### Agora 모듈 개발
-
-- Agora 도메인의 **컨트롤러를 새로 작성**할 때, `docs/agora/api/` 문서를 참고하세요. 문서에는 요청/응답 스펙, URL 매핑, Flutter 연동 가이드가 상세히 기술되어 있습니다.
-- WebSocket 관련 기능은 `WebSocketConfig`와 `ChatWebSocketController` 문서(미구현)를 함께 확인해야 합니다.
-- 파일 업로드는 `FileStorageConfig`에서 설정한 경로에 저장됩니다. 설정값을 확인하세요.
-
+- **인증/인가 관련 API**(`auth` 모듈)의 요청/응답 스펙, 엔드포인트, DTO 등을 변경한 경우, 반드시 **`docs/auth/`** 경로에 있는 md 파일들을 함께 수정하세요.
+- 
 ### 환경 변수
 
 - `src/main/resources/.env` 파일은 **민감 정보를 포함**하고 있으므로, 절대 버전 관리에 포함하지 마세요. (`.gitignore`에 이미 등록되어 있어야 합니다.)

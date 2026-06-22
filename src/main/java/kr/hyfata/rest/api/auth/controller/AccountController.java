@@ -70,11 +70,26 @@ public class AccountController {
     }
 
     /**
-     * POST /api/account/restore - 계정 복구
+     * POST /api/account/restore/request - 계정 복구 요청 (이메일 발송)
      */
-    @PostMapping("/restore")
-    public ResponseEntity<?> restoreAccount(@RequestBody RestoreAccountRequest request) {
-        String message = accountService.restoreAccount(request);
+    @PostMapping("/restore/request")
+    public ResponseEntity<?> requestAccountRestore(@RequestBody RestoreAccountRequest request) {
+        String message = accountService.requestAccountRestore(request.getEmail(), request.getClientId());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", message);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * GET /api/account/restore/confirm - 계정 복구 확인 (이메일 링크)
+     */
+    @GetMapping("/restore/confirm")
+    public ResponseEntity<?> confirmAccountRestore(@RequestParam String token) {
+        RestoreAccountConfirmRequest request = RestoreAccountConfirmRequest.builder()
+                .token(token)
+                .build();
+        String message = accountService.confirmAccountRestore(request);
 
         Map<String, String> response = new HashMap<>();
         response.put("message", message);

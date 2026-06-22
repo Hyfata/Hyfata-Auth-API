@@ -83,7 +83,8 @@ account:manage → account:password (implicit)
 | `GET /api/auth/verify-email` | 이메일 인증 |
 | `POST /api/auth/request-password-reset` | 비밀번호 재설정 요청 |
 | `POST /api/auth/reset-password` | 비밀번호 재설정 |
-| `POST /api/account/restore` | 계정 복구 |
+| `POST /api/account/restore/request` | 계정 복구 요청 (이메일 발송) |
+| `GET /api/account/restore/confirm` | 계정 복구 확인 (이메일 링크) |
 
 ### `profile` + `email` (기본 Scope)
 

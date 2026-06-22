@@ -42,6 +42,13 @@ public class TokenGenerator {
     }
 
     /**
+     * 계정 복구 토큰 생성
+     */
+    public String generateAccountRestoreToken() {
+        return generateRandomToken();
+    }
+
+    /**
      * 지정된 길이의 코드 생성
      */
     private String generateCode() {

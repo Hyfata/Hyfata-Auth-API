@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RestoreAccountRequest {
+public class RestoreAccountConfirmRequest {
 
-    private String email;
-
-    @Builder.Default
-    private String clientId = "default";
+    private String token;
 }

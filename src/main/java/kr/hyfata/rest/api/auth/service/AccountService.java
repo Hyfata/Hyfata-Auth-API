@@ -30,11 +30,19 @@ public interface AccountService {
     String deleteAccount(String email, DeleteAccountRequest request);
 
     /**
-     * 계정 복구
-     * @param request 복구 요청
+     * 계정 복구 요청 (이메일 발송)
+     * @param email 사용자 이메일
+     * @param clientId 클라이언트 ID
+     * @return 요청 완료 메시지
+     */
+    String requestAccountRestore(String email, String clientId);
+
+    /**
+     * 계정 복구 확인 (토큰 검증 후 활성화)
+     * @param request 복구 확인 요청
      * @return 복구 완료 메시지
      */
-    String restoreAccount(RestoreAccountRequest request);
+    String confirmAccountRestore(RestoreAccountConfirmRequest request);
 
     /**
      * 사용자 조회

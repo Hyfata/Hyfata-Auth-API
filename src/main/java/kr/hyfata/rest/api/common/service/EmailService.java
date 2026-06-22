@@ -96,6 +96,27 @@ public class EmailService {
         }
     }
 
+    /**
+     * 계정 복구 이메일 발송 (비동기)
+     */
+    @Async
+    public void sendAccountRestoreEmail(String to, String restoreToken, String clientId) {
+        try {
+            if (!mailEnabled) {
+                log.warn("메일 발송이 비활성화되어 있습니다. 계정 복구 메일을 건 넘깁니다: {}", to);
+                return;
+            }
+
+            String restoreLink = backendUrl + "/api/account/restore/confirm?token=" + restoreToken;
+            String subject = "Hyfata 계정 복구";
+            String html = buildAccountRestoreHtml(restoreLink);
+            sendHtmlEmail(to, subject, html);
+            log.info("계정 복구 이메일 발송 성공: {} (client: {})", to, clientId);
+        } catch (Exception e) {
+            log.error("계정 복구 이메일 발송 실패 {}: {}", to, e.getMessage(), e);
+        }
+    }
+
     private void sendHtmlEmail(String to, String subject, String html) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -144,6 +165,20 @@ public class EmailService {
                 + "</div>"
                 + "<p style='color:#888;font-size:13px;'>이 링크는 24시간 후에 만료됩니다.</p>"
                 + "<p style='color:#aaa;font-size:12px;margin-top:16px;word-break:break-all;'>링크가 안 되면 여기로 접속하세요:<br>" + verificationLink + "</p>"
+                + "</div></body></html>";
+    }
+
+    private String buildAccountRestoreHtml(String restoreLink) {
+        return "<!DOCTYPE html>"
+                + "<html><head><meta charset='UTF-8'></head><body style='font-family:sans-serif;background:#f5f5f5;padding:40px 0;'>"
+                + "<div style='max-width:480px;margin:0 auto;background:#fff;border-radius:8px;padding:32px;box-shadow:0 4px 12px rgba(0,0,0,0.1);'>"
+                + "<h2 style='color:#001F29;margin-bottom:16px;'>계정 복구</h2>"
+                + "<p style='color:#555;line-height:1.6;'>Hyfata 계정 복구를 요청하셨습니다. 아래 버튼을 클릭하면 계정이 다시 활성화됩니다.</p>"
+                + "<div style='text-align:center;margin:28px 0;'>"
+                + "<a href='" + restoreLink + "' style='display:inline-block;background:#00bcd4;color:#fff;text-decoration:none;padding:12px 28px;border-radius:4px;font-weight:600;'>계정 복구하기</a>"
+                + "</div>"
+                + "<p style='color:#888;font-size:13px;'>이 링크는 24시간 후에 만료됩니다.<br>요청하신 적이 없다면 이 메일을 무시해 주세요.</p>"
+                + "<p style='color:#aaa;font-size:12px;margin-top:16px;word-break:break-all;'>링크가 안 되면 여기로 접속하세요:<br>" + restoreLink + "</p>"
                 + "</div></body></html>";
     }
 }
