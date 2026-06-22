@@ -315,7 +315,7 @@ OFFICIAL_WEB_REDIRECT_URIS=https://hyfata.kr/oauth/callback
 
 ## 라이선스
 
-MIT License
+GNU GPL v3.0
 
 ---
 
